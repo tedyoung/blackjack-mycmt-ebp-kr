@@ -10,9 +10,18 @@ public class Player {
 	public Player(boolean isDealer) {
 		this.isDealer = isDealer;
 	}
+	
+	public Player(boolean isDealer, Hand hand) {
+		this.isDealer = isDealer;
+		this.hand = hand;
+	}
 
 	public void clearHand() {
 		hand = new Hand();
+	}
+
+	public int getHandValue() {
+		return hand.value();
 	}
 
 	public void drawCard(Deck deck) {
