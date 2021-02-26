@@ -7,13 +7,9 @@ import java.util.Scanner;
 import static org.fusesource.jansi.Ansi.ansi;
 
 public class Game {
-
   private final Deck deck;
-
-  private Hand dealerHand = new Hand();
-  private Hand playerHand = new Hand();
-  private int playerBalance = 0;
-  private int playerBet = 0;
+  private Player dealer = new Player(true);
+  private Player player = new Player(false);
 
   public static void main(String[] args) {
     displayWelcomeScreen();
@@ -53,8 +49,8 @@ public class Game {
   }
 
   public void initialDeal() {
-    dealerHand = new Hand();
-    playerHand = new Hand();
+	  dealer.clearHand();
+	  player.clearHand();
 
     // deal first round of cards, players first
     dealHand();
@@ -64,16 +60,8 @@ public class Game {
   }
 
   private void dealHand() {
-    drawCardIntoPlayerHand();
-    drawCardIntoDealerHand();
-  }
-
-  private void drawCardIntoDealerHand() {
-    dealerHand.add(deck.draw());
-  }
-
-  private void drawCardIntoPlayerHand() {
-    playerHand.add(deck.draw());
+	  player.drawCard(deck);
+	  dealer.drawCard(deck);
   }
 
   public void play() {
@@ -86,8 +74,8 @@ public class Game {
         break;
       }
       if (playerChoice.startsWith("h")) {
-        drawCardIntoPlayerHand();
-        playerBusted = playerHand.isBusted();
+        player.drawCard(deck);
+        playerBusted = player.isBusted();
       } else {
         System.out.println("You need to [H]it or [S]tand");
       }
@@ -95,7 +83,7 @@ public class Game {
 
     // Dealer makes its choice automatically based on a simple heuristic (<=16, hit, 17>stand)
     if (!playerBusted) {
-      dealerPlays();
+    	dealer.play(deck);
     }
 
     displayFinalGameState();
@@ -103,20 +91,14 @@ public class Game {
     handleGameOutcome();
   }
 
-  private void dealerPlays() {
-    while (dealerHand.value() <= 16) {
-      drawCardIntoDealerHand();
-    }
-  }
-
   private void handleGameOutcome() {
-    if (playerHand.isBusted()) {
+    if (player.isBusted()) {
       System.out.println("You Busted, so you lose.  💸");
-    } else if (dealerHand.isBusted()) {
+    } else if (dealer.isBusted()) {
       System.out.println("Dealer went BUST, Player wins! Yay for you!! 💵");
-    } else if (playerHand.beats(dealerHand)) {
+    } else if (player.beats(dealer)) {
       System.out.println("You beat the Dealer! 💵");
-    } else if (playerHand.pushesWith(dealerHand)) {
+    } else if (player.pushesWith(dealer)) {
       System.out.println("Push: The house wins, you Lose. 💸");
     } else {
       System.out.println("You lost to the Dealer. 💸");
@@ -131,80 +113,17 @@ public class Game {
 
   private void displayGameState() {
     clearScreen();
-    displayDealerHand();
-    displayPlayerHand();
+    dealer.displayHand();
+    player.displayHand();
   }
 
   private void displayFinalGameState() {
     clearScreen();
-    displayFinalDealerHand();
-    displayPlayerHand();
-  }
-
-  private void displayDealerHand() {
-    displayDealerUpCard();
-    displayDealerHoleCard();
-  }
-
-  private void displayDealerUpCard() {
-    System.out.println("Dealer has: ");
-    System.out.println(dealerHand.displayFirstCard()); // first card is Face Up
+    dealer.displayFinalDealerHand();
+    player.displayHand();
   }
 
   private void clearScreen() {
     System.out.print(ansi().eraseScreen().cursor(1, 1));
-  }
-  // second card is the hole card, which is hidden
-
-  private void displayDealerHoleCard() {
-    System.out.print(
-        ansi()
-            .cursorUp(7)
-            .cursorRight(12)
-            .a("┌─────────┐").cursorDown(1).cursorLeft(11)
-            .a("│░░░░░░░░░│").cursorDown(1).cursorLeft(11)
-            .a("│░ J I T ░│").cursorDown(1).cursorLeft(11)
-            .a("│░ T E R ░│").cursorDown(1).cursorLeft(11)
-            .a("│░ T E D ░│").cursorDown(1).cursorLeft(11)
-            .a("│░░░░░░░░░│").cursorDown(1).cursorLeft(11)
-            .a("└─────────┘"));
-  }
-
-  private void displayFinalDealerHand() {
-    System.out.println("Dealer has: ");
-    dealerHand.displayHand();
-    System.out.println(" (" + dealerHand.value() + ")");
-  }
-
-  private void displayPlayerHand() {
-    System.out.println();
-    System.out.println("Player has: ");
-    playerHand.displayHand();
-    System.out.println(" (" + playerHand.value() + ")");
-  }
-
-  public void playerDeposits(int amount) {
-    playerBalance += amount;
-  }
-
-  public void playerBets(int betAmount) {
-    playerBet = betAmount;
-    playerBalance -= betAmount;
-  }
-
-  public int playerBalance() {
-    return playerBalance;
-  }
-
-  public void playerWins() {
-    playerBalance += playerBet * 2;
-  }
-
-  public void playerLoses() {
-    playerBalance += playerBet * 0;
-  }
-
-  public void playerTies() {
-    playerBalance += playerBet * 1;
   }
 }

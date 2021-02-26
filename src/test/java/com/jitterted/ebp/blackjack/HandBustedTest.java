@@ -8,7 +8,7 @@ public class HandBustedTest {
 
   @Test
   public void handWithCardsValuedAt22IsBusted() throws Exception {
-    Hand hand = HandCreator.createHandOf("Q", "5", "7");
+    Hand hand = HandCreator.createHandOf(Rank.QUEEN, Rank.FIVE, Rank.SEVEN);
 
     assertThat(hand.isBusted())
         .isTrue();
@@ -16,7 +16,7 @@ public class HandBustedTest {
 
   @Test
   public void handWithCardsValuedAt21IsNotBusted() throws Exception {
-    Hand hand = HandCreator.createHandOf("10", "9", "2");
+    Hand hand = HandCreator.createHandOf(Rank.TEN, Rank.NINE, Rank.TWO);
 
     assertThat(hand.isBusted())
         .isFalse();
@@ -24,7 +24,7 @@ public class HandBustedTest {
 
   @Test
   public void handWithCardsValuedAt20IsNotBusted() throws Exception {
-    Hand hand = HandCreator.createHandOf("J", "7", "3");
+    Hand hand = HandCreator.createHandOf(Rank.JACK, Rank.SEVEN, Rank.THREE);
 
     assertThat(hand.isBusted())
         .isFalse();
@@ -32,7 +32,7 @@ public class HandBustedTest {
 
   @Test
   public void handWithCardsValuedAt22WithAceIsBusted() throws Exception {
-    Hand hand = HandCreator.createHandOf("A", "9", "8", "4");
+    Hand hand = HandCreator.createHandOf(Rank.ACE, Rank.NINE, Rank.EIGHT, Rank.FOUR);
 
     assertThat(hand.isBusted())
         .isTrue();

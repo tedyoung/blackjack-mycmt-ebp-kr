@@ -7,52 +7,56 @@ import java.util.stream.Collectors;
 import static org.fusesource.jansi.Ansi.ansi;
 
 public class Hand {
-  private final List<Card> cards = new ArrayList<>();
+	private final List<Card> cards = new ArrayList<>();
 
-  public void add(Card card) {
-    cards.add(card);
-  }
+	public Hand(List<Card> cards) {
+		this.cards.addAll(cards);
+	}
+	
+	public Hand() {
+		
+	}
 
-  public int value() {
-    int handValue = cards
-        .stream()
-        .mapToInt(Card::rankValue)
-        .sum();
+	public void drawCard(Deck deck) {
+		cards.add(deck.draw());
+	}	
 
-    // does the hand contain at least 1 Ace?
-    boolean hasAce = cards
-        .stream()
-        .anyMatch(card -> card.rankValue() == 1);
+	public int value() {
+		int handValue = cards.stream().mapToInt(Card::rankValue).sum();
 
-    // if the total hand value <= 11, then count the Ace as 11 by adding 10
-    if (hasAce && handValue <= 11) {
-      handValue += 10;
-    }
+		// does the hand contain at least 1 Ace?
+		boolean hasAce = cards.stream().anyMatch(card -> card.rankValue() == 1);
 
-    return handValue;
-  }
+		// if the total hand value <= 11, then count the Ace as 11 by adding 10
+		if (hasAce && handValue <= 11) {
+			handValue += 10;
+		}
 
-  void displayHand() {
-    System.out.println(cards
-                           .stream()
-                           .map(Card::display)
-                           .collect(Collectors.joining(
-                               ansi().cursorUp(6).cursorRight(1).toString())));
-  }
+		return handValue;
+	}
 
-  public boolean isBusted() {
-    return value() > 21;
-  }
+	void displayHand() {
+		System.out.println(cards.stream().map(Card::display)
+				.collect(Collectors.joining(ansi().cursorUp(6).cursorRight(1).toString())));
+	}
 
-  boolean beats(Hand hand) {
-    return hand.value() < value();
-  }
+	public boolean isBusted() {
+		return value() > 21;
+	}
 
-  boolean pushesWith(Hand hand) {
-    return hand.value() == value();
-  }
+	boolean beats(Hand hand) {
+		return hand.value() < value();
+	}
 
-  String displayFirstCard() {
-    return cards.get(0).display();
-  }
+	boolean pushesWith(Hand hand) {
+		return hand.value() == value();
+	}
+
+	String displayFirstCard() {
+		return cards.get(0).display();
+	}
+	
+	public boolean dealerMustDraw() {
+		return value() <= 16;
+	}
 }
